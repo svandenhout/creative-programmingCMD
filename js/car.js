@@ -19,7 +19,6 @@ function Car() {
 
 
   this.image.onload = function() {
-
     _this.centerX = _this.image.width / 2;
     _this.centerY = _this.image.height / 2;
   };
@@ -69,9 +68,8 @@ Car.prototype.turnRight = function() {
 };
 
 Car.prototype.turnLeft = function() {
-  console.log(this.velocity);
   this.angularVel = (
-    -this.maxTurnSpeed + 
+    -this.maxTurnSpeed +
     (this.velocity > -this.minTurnSpeed || this.velocity < 2) ?
     -this.minTurnSpeed : this.velocity
   ) * (Math.PI / 180);
@@ -92,7 +90,6 @@ Car.prototype.drive = function(ctx) {
 
   this.x = this.x + this.velocity * Math.cos(this.angle);
   this.y = this.y + this.velocity * Math.sin(this.angle);
-  console.log(this.centerX);
   ctx.translate(this.x, this.y);
   ctx.rotate(this.angle);
   ctx.drawImage(this.image, -this.centerX, -this.centerY);
