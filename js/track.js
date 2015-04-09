@@ -8,9 +8,13 @@ function Track() {
 }
 
 Track.prototype.exist = function(ctx) {
-  ctx.fillStyle = "white";
-  ctx.fill(this.outerPath);
-  ctx.fillStyle = "black";
+  // clear out clipped path (as a road)
+  ctx.clip(this.outerPath);
+  ctx.clearRect(0, 0, 1280, 600);
+  // nice orange finish
+  ctx.fillStyle = ctx.fillStyle = "rgba(255,165,0,0.99)";
+  ctx.fillRect(700, 0, 10, 200)
+  ctx.fillStyle = "rgba(0,0,0,1)";
   ctx.fill(this.innerPath);
 }
 

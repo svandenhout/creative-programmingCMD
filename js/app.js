@@ -9,12 +9,13 @@ var canvas = document.getElementById("canvas"),
     startLoad = 0,
     endLoad = 0;
 
-var car = new Car();
+var car = new Car(110, 220);
 var track = new Track();
-ctx.lineWidth = 2;
-ctx.strokeStyle = "black";
+
+ctx.fillStyle = "rgba(0,0,0,1)";
 setInterval(function() {
   ctx.clearRect(0, 0, 1280, 600); // clear canvas
+  ctx.fillRect(0, 0, 1280, 600);
   track.exist(ctx);
   car.drive(ctx);
 }, 1000/60);
