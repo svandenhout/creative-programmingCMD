@@ -5,7 +5,7 @@ function Car(x, y) {
   this.image = new Image();
   this.image.src = "assets/car.png";
   this.angularVel = 0;
-  this.angle = 0;
+  this.angle = 2;
   this.x = x;
   this.y = y;
   this.centerX = 0;
@@ -17,6 +17,7 @@ function Car(x, y) {
   this.backwardsAcc = 0.2;
   this.deceleration = 0.08;
   this.detectColission = true;
+  this.detectFinishColission = true;
   this.time;
 
   this._bindListeners();
@@ -92,27 +93,31 @@ Car.prototype._detectColission = function(ctx) {
     // bottom right
     imageData.data[imageData.data.length - 1] == 255
   ) {
+    this.velocity = -this.velocity * 0.4;
+
+    // 0.05 seconds where colission is not detected 
     this.detectColission = false;
-    this.velocity = -this.velocity * 0.7;
     setTimeout(function() { 
       _this.detectColission = true;
     }, 50);
   }
 
+  if(!this.detectFinishColission) return;
   // the finish has an alpha of 252 (.99)
   if(
     // top left
-    imageData.data[3] == 252 ||
-    // top right
-    imageData.data[(imageData.width * 4) -1] == 252 ||
-    // bottom left
-    imageData.data[imageData.data.length - 
-        (imageData.width * 4) + 3] == 252 ||
-    // bottom right
-    imageData.data[imageData.data.length - 1] == 252
+    imageData.data[3] == 252
   ) {
-    if(this.time) console.log(new Date().getTime() - this.time );
+    if(this.time) {
+      alert((new Date().getTime() - this.time) / 1000 + " Seconden");
+    }
     this.time = new Date().getTime();
+
+    // 0.5 seconds where the finish colission is not detected 
+    this.detectFinishColission = false;
+    setTimeout(function() { 
+      _this.detectFinishColission = true;
+    }, 500);
   }
 
   /* 
@@ -161,17 +166,17 @@ Car.prototype.turnRight = function() {
   // turnvelocity goes down when the car goes faster
   this.angularVel = (
     this.maxTurnSpeed - 
-    (this.velocity > -this.minTurnSpeed || this.velocity < 2) ?
-    this.minTurnSpeed : this.velocity
-  ) * (Math.PI / 180);
+    (this.velocity > this.minTurnSpeed) ?
+    this.minTurnSpeed * (Math.PI / 180) : -this.maxTurnSpeed
+  );
 };
 
 Car.prototype.turnLeft = function() {
   this.angularVel = (
     -this.maxTurnSpeed +
-    (this.velocity > -this.minTurnSpeed || this.velocity < 2) ?
-    -this.minTurnSpeed : this.velocity
-  ) * (Math.PI / 180);
+    (this.velocity > this.minTurnSpeed) ?
+    -this.minTurnSpeed * (Math.PI / 180) : -this.maxTurnSpeed
+  );
 };
 
 Car.prototype.drive = function(ctx) {
@@ -189,15 +194,16 @@ Car.prototype.drive = function(ctx) {
 
   this.x = this.x + this.velocity * Math.cos(this.angle);
   this.y = this.y + this.velocity * Math.sin(this.angle);
+  
+  // detect colissions should account for the car being rotated when
+  // called here.
+  this._detectColission(ctx);
 
   // we translate & rotate the canvas, draw the images and then 
   // restore the canvas positioning
   ctx.translate(this.x, this.y);
   ctx.rotate(this.angle);
 
-  // detect colissions should account for the car being rotated when
-  // called here.
-  this._detectColission(ctx);
   ctx.drawImage(this.image, -this.centerX, -this.centerY);
   ctx.restore();
 };
